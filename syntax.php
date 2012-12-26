@@ -43,7 +43,7 @@ function revision_callback_search_wanted(&$data,$base,$file,$type,$lvl,$opts) {
        $last_modifed = filemtime($filename);
     
        $revision_date = $last_modifed + (intval($revision_frequency) * 86400);
-	   if ($revision_date < time()) {
+	   if ($revision_date < time() || $revision_frequency != '') { 			//chlw:      or:  || $revision_frequency > 0  (don't know if there is a difference and which one is better...) 
             $data["$id"]=array('revision' => $last_modifed, 
                 'frequency' => $revision_frequency, 
                 'revision_date' => $revision_date );
