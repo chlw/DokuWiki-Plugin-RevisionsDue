@@ -5,6 +5,9 @@
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  * @author     <Stephan@SparklingSoftware.com.au>
  * @author     Stephan Dekker <Stephan@SparklingSoftware.com.au>
+ * siehe auch https://github.com/SparklingSoftware/DokuWiki-Plugin-RevisionsDue/issues/2
+ 
+ 
  */
  
 if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
@@ -43,7 +46,7 @@ function revision_callback_search_wanted(&$data,$base,$file,$type,$lvl,$opts) {
        $last_modifed = filemtime($filename);
     
        $revision_date = $last_modifed + (intval($revision_frequency) * 86400);
-	   if ($revision_date < time()) {
+	   if ($revision_date < time() || $revision_frequency != '')  {				//chlw:      or:  || $revision_frequency > 0  (don't know if there is a difference and which one is better...) 
             $data["$id"]=array('revision' => $last_modifed, 
                 'frequency' => $revision_frequency, 
                 'revision_date' => $revision_date );
@@ -55,7 +58,7 @@ function revision_callback_search_wanted(&$data,$base,$file,$type,$lvl,$opts) {
 
 function revision_string($revision) {
 
-  $result = date("Y-m-d", $revision);
+  $result = date("d.m.Y", $revision);
   return $result;
 }
 
@@ -199,7 +202,7 @@ class syntax_plugin_revisionsdue extends DokuWiki_Syntax_Plugin {
  
     // for valid html - need to close the <p> that is feed before this
     $output .= '</p>';
-    $output .= '<table class="inline"><tr><th> # </th><th>Title</th><th>Revised</th><th>Frequency</th><th>revision_date</th></tr>'."\n" ;
+       $output .= '<table class="inline"><tr><th colspan="5">Dokumente mit Revisionsdatum</th></tr><tr><th> # </th><th>Dokument</th><th>Letztes Revisionsdatum</th><th>Revisionsfrequenz</th><th>N&auml;chstes Revisionsdatum</th></tr>'."\n" ;
  
     uasort($data, 'date_compare');
 
@@ -247,7 +250,6 @@ class syntax_plugin_revisionsdue extends DokuWiki_Syntax_Plugin {
         . "\" class=\"" . "wikilink1"
         . "\"  onclick=\"return svchk()\" onkeypress=\"return svchk()\">"
         . $id .'</a></td><td>'.revision_string($revision)."</td><td>".$frequency."</td><td>".revision_string($revision_date)."</td></tr>\n";
- 
   			$count++;
   		}
  
